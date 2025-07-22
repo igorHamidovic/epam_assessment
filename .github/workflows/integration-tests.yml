@@ -30,7 +30,7 @@ jobs:
 
       - name: Run integration tests
         run: |
-          pytest tests
+          python tests/integration_tests.py
           
       - name: Shutdown services
         run: docker-compose down
