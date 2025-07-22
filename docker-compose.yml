@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  books_db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: books_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  books_api:
+    build: ./book_service
+    restart: always
+    ports:
+      - "8080:5000"
+    environment:
+      DATABASE_URL: postgresql://admin:admin@books_db:5432/books_db
+      FLASK_APP: api.py
+    depends_on:
+      books_db:
+        condition: service_healthy
+    volumes:
+      - ./book_service:/app
+
+volumes:
+  db_data:
