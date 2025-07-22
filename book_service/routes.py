@@ -46,7 +46,7 @@ def add_book():
     return BookSchema.from_orm(book).model_dump(), 201
 
 
-@books_bp.route('/<int:book_id>', methods=['PATCH'])
+@books_bp.route('/<int:book_id>', methods=['PUT'])
 def update_book(book_id):
     update_data = request.get_json()
     try:
