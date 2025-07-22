@@ -23,6 +23,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r book_service/requirements.txt
           pip install pytest==8.4.1
+          pip install requests
 
       - name: Install docker-compose
         run: |
