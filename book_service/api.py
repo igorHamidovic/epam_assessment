@@ -30,7 +30,7 @@ def health_check():
 def global_exception_handler(e):
     traceback.print_exc()
     BooksRepository(db.session).rollback()
-    return jsonify(message="Unexpected server error"), 500
+    return jsonify(message="Unexpected server error", steck=str(e)), 500
 
 
 if __name__ == '__main__':

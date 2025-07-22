@@ -45,10 +45,12 @@ def test_update_price_and_rating(book_id):
     print(f"Request body: {patch}")
     r = requests.put(f"{BASE}/books/{book_id}", json=patch, headers=HEADERS, timeout=3)
     print(f"Status code: {r.status_code}")
+    data = r.json()
+    print(f"Response body: {data}")
     assert r.status_code == 200
     data = r.json()
     print(f"Response body: {data}")
-    assert float(data["price"]) == float(patch["price"]) and data["rating"] == patch["rating"]
+    assert data["price"] == patch["price"] and data["rating"] == patch["rating"]
     print("Update price & rating")
 
 def test_filter_by_pages():
