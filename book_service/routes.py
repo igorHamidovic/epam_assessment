@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from models import db, Books
 from db_repository import BooksRepository
 from DTOs import BookSchema
@@ -35,14 +35,17 @@ def add_book():
         for err in e.errors():
             error_msgs.append(f"Field: {err['loc']}, error: {err['msg']}")
         msg = '; '.join(error_msgs)
+        current_app.logger.warning(f"Bad request for creating a new book. Error: {msg}")
         return jsonify({"error": "Validation failed", "details": msg}), 400
 
     db_repo = BooksRepository(db.session)
     if db_repo.get_by_id(new_book.id):
+        current_app.logger.error(f"Bad request for creating a new book. Book id {new_book.id} already exist")
         return jsonify({"error": "Validation failed", "details": f"Book id {new_book.id} already exist"}), 422
 
     book = Books(**new_book.model_dump())
     book = db_repo.add_book(book)
+    current_app.logger.info(f"Successful added new book: {book.id}, title: {book.title}")
     return BookSchema.from_orm(book).model_dump(), 201
 
 
@@ -52,8 +55,10 @@ def update_book(book_id):
     try:
         BookSchema.custom_validate_price_and_rating(update_data.get("price"), update_data.get("rating"))
     except ValueError as err:
+        current_app.logger.warning(f"Bad request for updating book {book_id}. Error: {str(err)}")
         return jsonify({"error": "Validation failed", "details": str(err)}), 400
 
     db_repo = BooksRepository(db.session)
     book = db_repo.update_price_and_rating(book_id, update_data.get("price"), update_data.get("rating"))
+    current_app.logger.info(f"Successful updated new book: {book.id}, title: {book.title}")
     return BookSchema.from_orm(book).model_dump()
