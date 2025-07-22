@@ -44,6 +44,7 @@ def test_update_price_and_rating(book_id):
     patch = {"price": 12.49, "rating": 4.8}
     print(f"Request body: {patch}")
     r = requests.put(f"{BASE}/books/{book_id}", json=patch, headers=HEADERS, timeout=3)
+    print(f"Status code: {r.status_code}")
     assert r.status_code == 200
     data = r.json()
     print(f"Response body: {data}")
